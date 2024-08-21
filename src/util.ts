@@ -1,54 +1,35 @@
-'use strict';
+"use strict";
 
-import * as fs from 'fs';
-import { workspace } from 'vscode';
+import { workspace } from "vscode";
 
-// TODO: move it to config
-// export const regexJumpFile = new RegExp('@livewire\\([\'\"](.*?)[\'\"]\\)', 'g');
-export const regexJumpFile = /((@livewire\([ \t\n]{0,}[\'\"])|<livewire:)(.*?)([\'\"][\),]|([ \t\n]|>))/g;
-export const regexCacheMap = new RegExp('\'(.*?)\' \=\> \'(.*?)\'', 'g');
+export const regexJumpFile =
+  /((@livewire\([ \t\n]{0,}[\'\"])|<livewire:)(.*?)([\'\"][\),]|([ \t\n]|>))/g;
 
-interface CacheMap {
-    [key: string]: string
+async function getPathComponentsFromLivewireConfig(wsPath: string) {
+  const livewireConfigDoc = await workspace.openTextDocument(
+    wsPath + "/config/livewire.php"
+  );
+  const docText = livewireConfigDoc.getText();
+
+  let pathComponents = docText
+    .match(/App\\.*?Livewire/)?.[0]
+    .replace(/\\\\/g, "/")
+    .replace(/App\//, "app/");
+
+  if (pathComponents) {
+    return pathComponents + "/";
+  }
 }
 
-export function getLivewireCacheMap(workspacePath: string | undefined): CacheMap {
-    let map: CacheMap = {};
+export async function convertToFilePath(wsPath: string, s: string) {
+  s = s
+    .replace(/-./g, (x) => x[1].toUpperCase())
+    .replace(/\../g, (x) => "/" + x[1].toUpperCase());
+  s = s[0].toUpperCase() + s.substring(1) + ".php";
 
-    const cacheFile = workspacePath + '/bootstrap/cache/livewire-components.php';
+  const pathComponents = await getPathComponentsFromLivewireConfig(wsPath);
 
-    if (!fs.existsSync(cacheFile)) {return map;}
-
-    const content = fs.readFileSync(cacheFile, 'utf-8');
-    const matches = content.matchAll(regexCacheMap);
-
-    for (const match of matches) {
-        map[match[1]] = workspacePath + '/' + convertNamespaceToFilePath(match[2]);
-    }
-
-    return map;
-}
-
-export function convertNamespaceToFilePath(namespace: string): string {
-    // for now, we assume that the namespace is same as the folder structure
-
-    // this replace App\\Http to App/Http. need backslash 8 times, weird.
-    namespace = namespace.replace(new RegExp("\\\\\\\\", 'g'), '/');
-    // this replace App to app.
-    namespace = namespace.replace('App', 'app');
-
-    return namespace + '.php';
-}
-
-export function convertToFilePath(wsPath:string, s: string): string {
-    s = (s.replace(/-./g, x=>x[1].toUpperCase())).replace(/\../g, x=>'/' + x[1].toUpperCase());
-    s = s[0].toUpperCase() + s.substring(1) + ".php";
-    
-    let pathComponents = workspace.getConfiguration('livewire-goto-updated-3').pathComponents;
-
-    if (!pathComponents.endsWith('/')) {
-        pathComponents += '/';
-    }
-
-    return wsPath + pathComponents + s;
+  if (pathComponents) {
+    return wsPath + "/" + pathComponents + s;
+  }
 }

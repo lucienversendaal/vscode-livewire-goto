@@ -1,35 +1,41 @@
-'use strict';
+"use strict";
 
 import {
-    Hover, HoverProvider as vsHoverProvider, MarkdownString, Position, ProviderResult, TextDocument, workspace
-} from 'vscode';
-import * as util from '../util';
-import DocumentLinkProvider from './documentLinkProvider';
+  Hover,
+  HoverProvider as vsHoverProvider,
+  MarkdownString,
+  Position,
+  TextDocument,
+  workspace,
+} from "vscode";
+import * as util from "../util";
 
 export default class HoverProvider implements vsHoverProvider {
-    provideHover(document: TextDocument, position: Position): ProviderResult<Hover> {
-        let ranges = document.getWordRangeAtPosition(position, util.regexJumpFile);
+  async provideHover(document: TextDocument, position: Position) {
+    let ranges = document.getWordRangeAtPosition(position, util.regexJumpFile);
 
-        if (!ranges) return;
+    if (!ranges) return;
 
-        const wsPath = workspace.getWorkspaceFolder(document.uri)?.uri.fsPath;
+    const wsPath = workspace.getWorkspaceFolder(document.uri)?.uri.fsPath;
 
-        if (!wsPath) return;
+    if (!wsPath) return;
 
-        // const cacheMap = util.getLivewireCacheMap(wsPath);
+    // const cacheMap = util.getLivewireCacheMap(wsPath);
 
-        const text = document.getText(ranges);
-        const matches = text.matchAll(util.regexJumpFile);
+    const text = document.getText(ranges);
+    const matches = text.matchAll(util.regexJumpFile);
 
-        for (const match of matches) {
-            const matchedPath = match[3];
-            const jumpPath =  util.convertToFilePath(wsPath, matchedPath);
+    for (const match of matches) {
+      const matchedPath = match[3];
+      const jumpPath = await util.convertToFilePath(wsPath, matchedPath);
 
-            const jumpPathShow = jumpPath.replace(wsPath + '/', '');
+      if (!jumpPath) continue;
 
-            const markdown = '\`class:\`' + `[${jumpPathShow}](${jumpPath}) \n`;
+      const jumpPathShow = jumpPath.replace(wsPath + "/", "");
 
-            return new Hover(new MarkdownString(markdown));
-        }
+      const markdown = "`class:`" + `[${jumpPathShow}](${jumpPath}) \n`;
+
+      return new Hover(new MarkdownString(markdown));
     }
+  }
 }
