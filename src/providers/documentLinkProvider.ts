@@ -4,7 +4,6 @@ import {
   DocumentLink,
   DocumentLinkProvider as vsDocumentLinkProvider,
   Position,
-  ProviderResult,
   Range,
   TextDocument,
   Uri,
@@ -18,7 +17,9 @@ export default class DocumentLinkProvider implements vsDocumentLinkProvider {
 
     const wsPath = workspace.getWorkspaceFolder(document.uri)?.uri.fsPath;
 
-    if (!wsPath) return;
+    if (!wsPath) {
+      return;
+    }
 
     // const cacheMap = util.getLivewireCacheMap(wsPath);
     for (let index = 0; index < document.lineCount; index++) {
@@ -35,7 +36,9 @@ export default class DocumentLinkProvider implements vsDocumentLinkProvider {
 
         const jumpPath = await util.convertToFilePath(wsPath, matchedPath);
 
-        if (jumpPath == undefined) continue;
+        if (!jumpPath) {
+          continue;
+        }
 
         documentLinks.push(
           new DocumentLink(
