@@ -1,6 +1,6 @@
 "use strict";
 
-import { workspace } from "vscode";
+import { Uri, window, workspace } from "vscode";
 
 export const regexJumpFile =
   /((@livewire\([ \t\n]{0,}[\'\"])|<livewire:)(.*?)([\'\"][\),]|([ \t\n]|>))/g;
@@ -16,8 +16,19 @@ async function getPathComponentsFromLivewireConfig(wsPath: string) {
     .replace(/\\\\/g, "/")
     .replace(/App\//, "app/");
 
-  if (pathComponents) {
-    return pathComponents + "/";
+  return pathComponents;
+}
+
+function getPathComponentsFromComposerJson(wsPath: string) {
+  const composerJson = require(wsPath + "/composer.json");
+  const livewireVersion =
+    +composerJson.require["livewire/livewire"].match(/\d/);
+
+  if (livewireVersion === 2) {
+    return "app/Http/Livewire";
+  }
+  if (livewireVersion === 3) {
+    return "app/Livewire";
   }
 }
 
@@ -27,9 +38,27 @@ export async function convertToFilePath(wsPath: string, s: string) {
     .replace(/\../g, (x) => "/" + x[1].toUpperCase());
   s = s[0].toUpperCase() + s.substring(1) + ".php";
 
-  const pathComponents = await getPathComponentsFromLivewireConfig(wsPath);
+  let pathComponents;
+
+  try {
+    pathComponents = getPathComponentsFromComposerJson(wsPath);
+  } catch (err) {
+    console.log(err);
+  }
+
+  if (!pathComponents) {
+    try {
+      pathComponents = await getPathComponentsFromLivewireConfig(wsPath);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  if (!pathComponents) {
+    pathComponents = workspace.getConfiguration("livewire-goto").pathComponents;
+  }
 
   if (pathComponents) {
-    return wsPath + "/" + pathComponents + s;
+    return Uri.joinPath(Uri.file(wsPath), pathComponents, s).fsPath;
   }
 }

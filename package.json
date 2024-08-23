@@ -21,6 +21,19 @@
     "onLanguage:blade"
   ],
   "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Livewire goto v3 configuration",
+      "properties": {
+        "livewire-goto.pathComponents": {
+          "type": "string",
+          "default": "/app/Livewire",
+          "description": "Root path to the Livewire components folder"
+        }
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
