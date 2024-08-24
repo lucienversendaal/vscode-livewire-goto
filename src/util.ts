@@ -1,6 +1,6 @@
 "use strict";
 
-import { Uri, window, workspace } from "vscode";
+import { Uri, workspace } from "vscode";
 
 export const regexJumpFile =
   /((@livewire\([ \t\n]{0,}[\'\"])|<livewire:)(.*?)([\'\"][\),]|([ \t\n]|>))/g;
@@ -38,24 +38,49 @@ export async function convertToFilePath(wsPath: string, s: string) {
     .replace(/\../g, (x) => "/" + x[1].toUpperCase());
   s = s[0].toUpperCase() + s.substring(1) + ".php";
 
-  let pathComponents;
+  let pathComponents = null;
 
   try {
+    // throws error if composer.json does not exist
     pathComponents = getPathComponentsFromComposerJson(wsPath);
+    // throws error if file does not exist
+    if (pathComponents) {
+      await workspace.fs.stat(
+        Uri.joinPath(Uri.file(wsPath), pathComponents, s)
+      );
+    }
   } catch (err) {
-    console.log(err);
+    pathComponents = null;
   }
 
   if (!pathComponents) {
     try {
+      // throws error if livewire.php does not exist
       pathComponents = await getPathComponentsFromLivewireConfig(wsPath);
+      // throws error if file does not exist
+      if (pathComponents) {
+        await workspace.fs.stat(
+          Uri.joinPath(Uri.file(wsPath), pathComponents, s)
+        );
+      }
     } catch (err) {
-      console.log(err);
+      pathComponents = null;
     }
   }
 
   if (!pathComponents) {
+    // fallback to configuration
     pathComponents = workspace.getConfiguration("livewire-goto").pathComponents;
+    if (pathComponents) {
+      try {
+        // throws error if file does not exist
+        await workspace.fs.stat(
+          Uri.joinPath(Uri.file(wsPath), pathComponents, s)
+        );
+      } catch (err) {
+        pathComponents = null;
+      }
+    }
   }
 
   if (pathComponents) {
