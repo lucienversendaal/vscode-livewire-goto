@@ -11,7 +11,7 @@
     "url": "https://github.com/lucienversendaal/vscode-livewire-goto.git"
   },
   "engines": {
-    "vscode": "^1.84.0"
+    "vscode": "^1.92.0"
   },
   "categories": [
     "Other"
@@ -43,10 +43,11 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/glob": "^8.0",
-    "@types/mocha": "^10.0",
-    "@types/node": "^20.0",
-    "@types/vscode": "^1.84.0",
+    "@types/assert": "^1.5.10",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.16.5",
+    "@types/vscode": "^1.92.0",
     "@typescript-eslint/eslint-plugin": "^6.0",
     "@typescript-eslint/parser": "^6.0",
     "eslint": "^8.0",
