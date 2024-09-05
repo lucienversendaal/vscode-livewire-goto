@@ -1,5 +1,5 @@
 {
-  "name": "livewire-goto-v4",
+  "name": "livewire-goto",
   "displayName": "Livewire Goto v4",
   "description": "Livewire goto vscode extension for Livewire v2 and v3 with fallback function",
   "version": "1.3.0",
