@@ -24,7 +24,7 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Livewire goto v3 configuration",
+      "title": "Livewire Goto v4 configuration",
       "properties": {
         "livewire-goto.pathComponents": {
           "type": "string",
