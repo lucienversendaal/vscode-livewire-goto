@@ -1,14 +1,14 @@
 {
-  "name": "livewire-goto",
-  "displayName": "Livewire goto",
-  "description": "Livewire goto vscode extension",
+  "name": "livewire-goto-v4",
+  "displayName": "Livewire Goto v4",
+  "description": "Livewire goto vscode extension for Livewire v2 and v3 with fallback function",
   "version": "1.3.0",
-  "icon": "img/icon.png",
-  "publisher": "ozair-dev",
-  "homepage": "https://github.com/ozair-dev/vscode-livewire-goto",
+  "icon": "img/logo.png",
+  "publisher": "lucienversendaal",
+  "homepage": "https://github.com/lucienversendaal/vscode-livewire-goto",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ozair-dev/vscode-livewire-goto.git"
+    "url": "https://github.com/lucienversendaal/vscode-livewire-goto.git"
   },
   "engines": {
     "vscode": "^1.84.0"
