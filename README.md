@@ -8,3 +8,9 @@ Support for livewire v2 and v3, with a fallback functionality when the config fi
 ## Features
 * Livewire goto class
 * Support for livewire:name and @livewire('name', config) syntax
+
+## Support me
+<a
+href="https://www.buymeacoffee.com/lucienversendaal"><img
+src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" width="150" />
+</a>
